@@ -1,0 +1,42 @@
+/* ========== BASE ========== */
+body { background: #0b0b0b; color: #e5e5e5; }
+::selection { background: #991b1b; color: #fff; }
+
+/* ========== REVEAL AL HACER SCROLL ========== */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity .9s ease, transform .9s cubic-bezier(.22, .8, .3, 1);
+}
+.reveal.show { opacity: 1; transform: none; }
+
+/* ========== BRILLO PULSANTE DE BOTONES ========== */
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(220, 38, 38, .5), 0 0 24px rgba(153, 27, 27, .4); }
+  50%      { box-shadow: 0 0 22px rgba(220, 38, 38, .95), 0 0 48px rgba(220, 38, 38, .5); }
+}
+.glow { animation: glow 2.4s ease-in-out infinite; }
+
+/* ========== HOJAS CAYENDO (las crea el JS) ========== */
+.leaf {
+  position: absolute;
+  top: -6%;
+  background: #b91c1c;
+  opacity: .7;
+  border-radius: 0 100% 0 100%;
+  pointer-events: none;
+  animation: fall linear infinite;
+}
+@keyframes fall {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: .8; }
+  50%  { transform: translate3d(60px, 55vh, 0) rotate(200deg); }
+  100% { transform: translate3d(-40px, 110vh, 0) rotate(420deg); opacity: 0; }
+}
+
+/* ========== ACCESIBILIDAD ========== */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .glow, .leaf { animation: none; }
+}

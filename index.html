@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shadows of Edo | Action RPG in Feudal Japan</title>
+  <meta name="description" content="Shadows of Edo: embrace the path of the lone ronin in a fractured feudal Japan. Pre-order now.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { ink: '#0b0b0b', coal: '#121212', blood: '#dc2626', bloodDark: '#991b1b' },
+          fontFamily: { serif: ['Cinzel', 'serif'], sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { background: #0b0b0b; color: #e5e5e5; }
+    ::selection { background: #991b1b; color: #fff; }
+
+    /* Reveal al hacer scroll */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity .9s ease, transform .9s cubic-bezier(.22,.8,.3,1); }
+    .reveal.show { opacity: 1; transform: none; }
+
+    /* Brillo pulsante de los botones rojos */
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 10px rgba(220,38,38,.5), 0 0 24px rgba(153,27,27,.4); }
+      50%      { box-shadow: 0 0 22px rgba(220,38,38,.95), 0 0 48px rgba(220,38,38,.5); }
+    }
+    .glow { animation: glow 2.4s ease-in-out infinite; }
+
+    /* Hojas cayendo (creadas con JS) */
+    .leaf {
+      position: absolute; top: -6%; background: #b91c1c; opacity: .7;
+      border-radius: 0 100% 0 100%; pointer-events: none;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0; }
+      10%  { opacity: .8; }
+      50%  { transform: translate3d(60px, 55vh, 0) rotate(200deg); }
+      100% { transform: translate3d(-40px, 110vh, 0) rotate(420deg); opacity: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal { opacity: 1; transform: none; transition: none; }
+      .glow, .leaf { animation: none; }
+    }
+  </style>
+</head>
+
+<body class="font-sans antialiased">
+
+  <!-- 1. HEADER -->
+  <header id="header" class="fixed inset-x-0 top-0 z-50 transition-all duration-300 bg-black/30 backdrop-blur-md border-b border-white/5">
+    <nav class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between" aria-label="Main">
+      <a href="#top" class="flex items-center gap-3 group">
+        <span class="relative grid place-items-center w-8 h-8 rotate-45 bg-blood shadow-[0_0_14px_rgba(220,38,38,.7)] group-hover:rotate-[135deg] transition-transform duration-500">
+          <span class="w-3 h-3 bg-ink"></span>
+        </span>
+        <span class="font-serif font-black tracking-[.3em] text-white text-lg">KAGE</span>
+      </a>
+
+      <ul class="hidden md:flex items-center gap-10 text-xs font-medium tracking-[.25em]">
+        <li><a href="#tale" class="text-neutral-300 hover:text-blood transition-colors">EL CUENTO</a></li>
+        <li><a href="#gameplay" class="text-neutral-300 hover:text-blood transition-colors">JUGABILIDAD</a></li>
+        <li><a href="#media" class="text-neutral-300 hover:text-blood transition-colors">MEDIOS</a></li>
+      </ul>
+
+      <a href="#preorder" class="hidden md:inline-block text-xs font-semibold tracking-[.2em] px-5 py-2.5 border border-blood text-blood hover:bg-blood hover:text-white transition-colors">RESERVA ANTICIPADA</a>
+
+      <button id="menuBtn" class="md:hidden text-white text-2xl" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+        <i class="bi bi-list"></i>
+      </button>
+    </nav>
+
+    <div id="mobileMenu" class="hidden md:hidden bg-black/90 backdrop-blur-md border-t border-white/5">
+      <ul class="px-6 py-4 flex flex-col gap-4 text-xs font-medium tracking-[.25em]">
+        <li><a href="#tale" class="block text-neutral-300 hover:text-blood">EL CUENTO</a></li>
+        <li><a href="#gameplay" class="block text-neutral-300 hover:text-blood">JUGABILIDAD</a></li>
+        <li><a href="#media" class="block text-neutral-300 hover:text-blood">MEDIOS</a></li>
+        <li><a href="#preorder" class="block text-blood">PRE-ORDER</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- 2. HERO -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-b from-black via-[#1a0505] to-[#3a0808]">
+      <img src="img/hero-ronin.jpg" data-fallback alt="A lone ronin sitting under a tree of red leaves"
+           class="absolute inset-0 w-full h-full object-cover object-center opacity-70" fetchpriority="high">
+      <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-black/20 to-ink"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,0,.55),transparent_70%)]"></div>
+      <div id="leaves" class="absolute inset-0 overflow-hidden" aria-hidden="true"></div>
+
+      <div class="relative z-10 max-w-4xl mx-auto px-6 text-center pt-16">
+        <p class="reveal text-[11px] md:text-xs tracking-[.5em] text-blood font-medium mb-6">DE LOS CREADORES DE...</p>
+        <h1 class="reveal font-serif font-black text-white text-5xl sm:text-7xl lg:text-8xl leading-[1.05] tracking-wide drop-shadow-[0_4px_30px_rgba(0,0,0,.9)]">
+          SHADOWS OF EDO
+        </h1>
+        <p class="reveal mt-8 max-w-2xl mx-auto text-neutral-300 text-base md:text-lg font-light leading-relaxed">
+          Abraza el camino del ronin solitario. Domina el arte de la hoja, navega por un mundo fracturado pintado de sangre y hojas cayendo, y forja tu propio destino.        </p>
+        <div class="reveal mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="#media" class="glow inline-flex items-center justify-center gap-2 px-8 py-4 bg-blood hover:bg-bloodDark text-white text-xs font-semibold tracking-[.25em] transition-colors">
+            <i class="bi bi-play-fill text-lg"></i> REPRODUCIR TRAILER
+          </a>
+          <a href="#tale" class="inline-flex items-center justify-center px-8 py-4 border border-white/60 hover:bg-white hover:text-black text-white text-xs font-semibold tracking-[.25em] transition-colors">
+            EXPLORAR MUNDO
+          </a>
+        </div>
+      </div>
+
+      <a href="#tale" class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-[10px] tracking-[.4em] text-neutral-400 hover:text-white transition-colors">
+        DESPLAZARSE PARA DESCENDER
+        <i class="bi bi-chevron-double-down text-blood text-lg animate-bounce"></i>
+      </a>
+    </section>
+
+    <!-- 3. THE TALE -->
+    <section id="tale" class="py-24 md:py-32 bg-ink">
+      <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-14 items-center">
+        <div class="reveal">
+          <p class="text-blood text-xs tracking-[.4em] font-medium mb-5">-- EL CUELLO --</p>
+          <h2 class="font-serif font-bold text-white text-3xl md:text-5xl leading-tight mb-8">UN REINO EN RUINAS.<br>UN VOTO NO ROTO.</h2>
+          <div class="w-20 h-px bg-gradient-to-r from-blood to-transparent mb-8"></div>
+          <p class="text-neutral-400 leading-8 mb-5">
+            El año es 1598. Los grandes señores de la guerra han destrozado Japón, y los antaño orgullosos castillos de Edo ahora se alzan como siluetas carbonizadas contra un cielo sangrante. Los clanes que juraron paz eterna afilan sus espadas en la oscuridad.
+          </p>
+          <p class="text-neutral-400 leading-8">
+            Jin, un ronin sin maestro y sin un nombre digno de recordar, camina por los caminos en ruinas llevando una sola promesa. Su viaje le llevará por aldeas en llamas, bosques silenciosos y santuarios encantados, donde cada elección deja una cicatriz y cada silencio oculta una cuchilla.
+          </p>
+        </div>
+
+        <div class="reveal group relative p-3 bg-coal border border-white/10 hover:border-blood/60 transition-colors duration-500 shadow-[0_20px_60px_rgba(0,0,0,.8)]">
+          <div class="relative overflow-hidden aspect-[4/3] bg-gradient-to-br from-[#2a0606] via-[#141414] to-black">
+            <img src="img/tale-dusk.jpg" data-fallback alt="Twilight landscape of mountains at dusk"
+                 class="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-[900ms]" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+            <span class="absolute bottom-4 left-4 text-[10px] tracking-[.35em] text-neutral-300">EDO, 1598</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. MECHANICS -->
+    <section id="gameplay" class="py-24 md:py-32 bg-coal">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="reveal text-center mb-16">
+          <p class="text-blood text-xs tracking-[.4em] font-medium mb-5">-- MECÁNICA --</p>
+          <h2 class="font-serif font-bold text-white text-3xl md:text-5xl">DOMINA TU ARSENAL</h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <article class="reveal group p-8 bg-ink border border-white/5 border-b-2 border-b-bloodDark hover:-translate-y-2 hover:border-b-blood hover:shadow-[0_18px_45px_rgba(220,38,38,.2)] transition-all duration-500">
+            <i class="bi bi-slash-lg text-4xl text-blood block mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-500"></i>
+            <h3 class="font-serif font-bold text-white text-xl mb-3">Precisión Letal</h3>
+            <p class="text-neutral-400 leading-7 text-sm">Cada duelo se decide en un instante. Lee la postura de tu enemigo, para en el instante perfecto y encadena golpes devastadores con un sistema de combate basado en el tiempo y el ritmo.</p>
+          </article>
+
+          <article class="reveal group p-8 bg-ink border border-white/5 border-b-2 border-b-bloodDark hover:-translate-y-2 hover:border-b-blood hover:shadow-[0_18px_45px_rgba(220,38,38,.2)] transition-all duration-500">
+            <i class="bi bi-incognito text-4xl text-blood block mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-500"></i>
+            <h3 class="font-serif font-bold text-white text-xl mb-3">Camino del Fantasma</h3>
+            <p class="text-neutral-400 leading-7 text-sm">Conviértete en un susurro en la noche. Acechar entre la hierba alta y los tejados, atacar desde las sombras y desaparecer antes de que den la alarma.</p>
+          </article>
+
+          <article class="reveal group p-8 bg-ink border border-white/5 border-b-2 border-b-bloodDark hover:-translate-y-2 hover:border-b-blood hover:shadow-[0_18px_45px_rgba(220,38,38,.2)] transition-all duration-500">
+            <i class="bi bi-map text-4xl text-blood block mb-6 group-hover:scale-110 group-hover:-rotate-12 transition-transform duration-500"></i>
+            <h3 class="font-serif font-bold text-white text-xl mb-3">Belleza Fracturada</h3>
+            <p class="text-neutral-400 leading-7 text-sm">Un mundo abierto de montañas brumosas, bosques carmesí y castillos en ruinas. Sigue las hojas que caen para descubrir secretos que ningún mapa puede mostrar.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. VISUAL ARCHIVES -->
+    <section id="media" class="py-24 md:py-32 bg-ink">
+      <div class="max-w-7xl mx-auto px-6">
+        <div class="reveal text-center mb-14">
+          <p class="text-blood text-xs tracking-[.4em] font-medium mb-5">-- MEDIOS --</p>
+          <h2 class="font-serif font-bold text-white text-3xl md:text-5xl">ARCHIVOS VISUALES</h2>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 auto-rows-[150px] md:auto-rows-[200px] gap-3 md:gap-4">
+          <figure class="reveal group relative overflow-hidden col-span-2 row-span-2 bg-gradient-to-br from-[#1b1b1b] to-[#3a0808]">
+            <img src="img/gallery-lake.jpg" data-fallback alt="Mountains reflected in a still lake" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[900ms]" loading="lazy">
+            <figcaption class="absolute inset-0 flex items-end p-5 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <span class="font-serif text-white tracking-[.25em] text-sm translate-y-3 group-hover:translate-y-0 transition-transform duration-500">ESPEJO DE LA TRISTEZA</span>
+            </figcaption>
+          </figure>
+
+          <figure class="reveal group relative overflow-hidden bg-gradient-to-br from-[#241010] to-[#0f0f0f]">
+            <img src="img/gallery-armor.avif" data-fallback alt="Weathered lacquered armor texture" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[900ms]" loading="lazy">
+            <figcaption class="absolute inset-0 flex items-end p-4 bg-gradient-to-t from-black/85 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <span class="font-serif text-white tracking-[.2em] text-xs">ARMADURA ANCESTRAL</span>
+            </figcaption>
+          </figure>
+
+          <figure class="reveal group relative overflow-hidden row-span-2 bg-gradient-to-b from-[#12081a] to-[#3a0808]">
+            <img src="img/gallery-alley.jpg" data-fallback alt="Neon-lit Japanese alley at night" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[900ms]" loading="lazy">
+            <figcaption class="absolute inset-0 flex items-end p-4 bg-gradient-to-t from-black/85 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <span class="font-serif text-white tracking-[.2em] text-xs">EMBOSCADA DE MEDIANOCHE</span>
+            </figcaption>
+          </figure>
+
+          <figure class="reveal group relative overflow-hidden bg-gradient-to-br from-[#3a0808] to-[#0f0f0f]">
+            <img src="img/gallery-torii.jpg" data-fallback alt="Traditional red torii gate" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[900ms]" loading="lazy">
+            <figcaption class="absolute inset-0 flex items-end p-4 bg-gradient-to-t from-black/85 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <span class="font-serif text-white tracking-[.2em] text-xs">PUERTA DE LOS MUERTOS</span>
+            </figcaption>
+          </figure>
+
+          <figure class="reveal group relative overflow-hidden col-span-2 bg-gradient-to-r from-[#0f0f0f] to-[#2a0606]">
+            <img src="img/gallery-blade.jpg" data-fallback alt="A katana resting on dark stone" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[900ms]" loading="lazy">
+            <figcaption class="absolute inset-0 flex items-end p-5 bg-gradient-to-t from-black/85 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+              <span class="font-serif text-white tracking-[.25em] text-sm">THE HOJA SOLITARIA</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <div class="reveal text-center mt-12">
+          <a href="#" class="inline-block px-8 py-4 border border-white/40 hover:border-blood hover:bg-blood text-white text-xs font-semibold tracking-[.25em] transition-colors">VER GALERÍA COMPLETA</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. PRE-ORDER -->
+    <section id="preorder" class="py-24 md:py-32 bg-gradient-to-b from-coal via-[#1a0808] to-coal">
+      <div class="max-w-5xl mx-auto px-6">
+        <div class="reveal text-center mb-16">
+          <h2 class="font-serif font-bold text-white text-3xl md:text-5xl mb-5">ASEGURA TU LEGADO</h2>
+          <p class="text-neutral-400 max-w-xl mx-auto">Reserva tu copia hoy mismo y desbloquea contenido exclusivo disponible solo para quienes respondan a la llamada antes del lanzamiento.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 items-stretch">
+          <!-- Standard -->
+          <article class="reveal flex flex-col p-8 bg-ink border border-white/10 hover:border-white/30 transition-colors">
+            <h3 class="font-serif font-bold text-white text-2xl">Edición Estándar</h3>
+            <p class="font-serif text-4xl text-white mt-3 mb-6">Bs. 69.99</p>
+            <ul class="space-y-3 text-sm text-neutral-400 mb-8 flex-1">
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Shadows of Edo (juego base)</li>
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Bono de reserva: set de armadura "Wanderer"</li>
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Paquete de fondo de pantalla digital</li>
+            </ul>
+            <a href="#" class="block text-center py-4 border border-white/50 hover:bg-white hover:text-black text-white text-xs font-semibold tracking-[.25em] transition-colors">RESERVA ESTÁNDAR ANTICIPADA</a>
+          </article>
+
+          <!-- Collector's -->
+          <article class="reveal relative flex flex-col p-8 bg-ink border border-blood/70 shadow-[0_0_40px_rgba(220,38,38,.25)]">
+            <span class="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-blood text-white text-[10px] font-semibold tracking-[.3em]">MÁS POPULARES</span>
+            <h3 class="font-serif font-bold text-white text-2xl">Edición de Coleccionista</h3>
+            <p class="font-serif text-4xl text-blood mt-3 mb-6">Bs. 129.99</p>
+            <ul class="space-y-3 text-sm text-neutral-300 mb-8 flex-1">
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Todo lo de la Edición Estándar</li>
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Libro de arte en tapa dura (192 páginas)</li>
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Estatua de coleccionista de Jin de 10"</li>
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Moneda réplica de la era edo</li>
+              <li class="flex gap-3"><i class="bi bi-check2 text-blood"></i> Banda sonora digital</li>
+            </ul>
+            <a href="#" class="glow block text-center py-4 bg-blood hover:bg-bloodDark text-white text-xs font-semibold tracking-[.25em] transition-colors">RESERVA DE COLECCIONISTAS ANTICIPADA</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. NEWSLETTER -->
+    <section id="newsletter" class="py-24 bg-ink border-t border-white/5">
+      <div class="reveal max-w-2xl mx-auto px-6 text-center">
+        <h2 class="font-serif font-bold text-white text-3xl md:text-4xl mb-4">ÚNETE A LAS SOMBRAS</h2>
+        <p class="text-neutral-400 mb-8">Recibe noticias, invitaciones a beta y contenido exclusivo  en tu bandeja de entrada.</p>
+        <form id="newsForm" class="flex flex-col sm:flex-row gap-3" novalidate>directamente
+          <label for="email" class="sr-only">Email</label>
+          <input id="email" type="email" required placeholder="your@email.com"
+                 class="flex-1 px-5 py-4 bg-coal border border-white/15 text-white placeholder-neutral-600 focus:outline-none focus:border-blood focus:ring-1 focus:ring-blood transition">
+          <button type="submit" class="px-8 py-4 bg-blood hover:bg-bloodDark text-white text-xs font-semibold tracking-[.25em] transition-colors">SUSCRÍBETE</button>
+        </form>
+        <p id="formMsg" class="mt-4 text-sm min-h-[1.25rem]" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-black border-t border-white/10 py-12">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col items-center gap-6 text-center">
+      <a href="#top" class="flex items-center gap-3">
+        <span class="grid place-items-center w-7 h-7 rotate-45 bg-blood"><span class="w-2.5 h-2.5 bg-black"></span></span>
+        <span class="font-serif font-black tracking-[.3em] text-white">KAGE</span>
+      </a>
+      <div class="flex gap-4 text-lg">
+        <a href="#" aria-label="Twitter" class="grid place-items-center w-10 h-10 border border-white/20 text-neutral-300 hover:bg-bloodDark hover:border-blood hover:text-white hover:-translate-y-1 transition-all"><i class="bi bi-twitter-x"></i></a>
+        <a href="#" aria-label="YouTube" class="grid place-items-center w-10 h-10 border border-white/20 text-neutral-300 hover:bg-bloodDark hover:border-blood hover:text-white hover:-translate-y-1 transition-all"><i class="bi bi-youtube"></i></a>
+        <a href="#" aria-label="Discord" class="grid place-items-center w-10 h-10 border border-white/20 text-neutral-300 hover:bg-bloodDark hover:border-blood hover:text-white hover:-translate-y-1 transition-all"><i class="bi bi-discord"></i></a>
+      </div>
+      <nav class="flex gap-6 text-xs text-neutral-500" aria-label="Legal">
+        <a href="#" class="hover:text-white">Política de Privacidad</a>
+        <a href="#" class="hover:text-white">Términos de Servicio</a>
+      </nav>
+      <p class="text-xs text-neutral-600 max-w-xl leading-relaxed">
+        &copy; <span id="year">2026</span> KAGE Studios. Shadows of Edo es un producto ficticio creado con fines demostrativos. Todos los nombres, logotipos y contenidos son propiedad de sus respectivos propietarios.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const $ = (s, c = document) => c.querySelector(s);
+      const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+
+      // Header: más opaco al hacer scroll
+      const header = $('#header');
+      const onScroll = () => {
+        const scrolled = window.scrollY > 60;
+        header.classList.toggle('bg-black/80', scrolled);
+        header.classList.toggle('bg-black/30', !scrolled);
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      // Menú móvil
+      const btn = $('#menuBtn'), menu = $('#mobileMenu');
+      btn.addEventListener('click', () => {
+        const open = menu.classList.toggle('hidden') === false;
+        btn.setAttribute('aria-expanded', open);
+        btn.innerHTML = open ? '<i class="bi bi-x-lg"></i>' : '<i class="bi bi-list"></i>';
+      });
+      $$('a', menu).forEach(a => a.addEventListener('click', () => {
+        menu.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+        btn.innerHTML = '<i class="bi bi-list"></i>';
+      }));
+
+      // Reveal al entrar en el viewport
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }
+        });
+      }, { threshold: 0.15 });
+      $$('.reveal').forEach((el, i) => {
+        el.style.transitionDelay = `${(i % 3) * 120}ms`;
+        io.observe(el);
+      });
+
+      // Hojas cayendo en el hero
+      const leaves = $('#leaves');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        for (let i = 0; i < 18; i++) {
+          const l = document.createElement('span');
+          const s = 8 + Math.random() * 10;
+          l.className = 'leaf';
+          l.style.cssText = `left:${Math.random() * 100}%;width:${s}px;height:${s * 1.4}px;` +
+            `animation-duration:${9 + Math.random() * 10}s;animation-delay:${-Math.random() * 15}s;`;
+          leaves.appendChild(l);
+        }
+      }
+
+      // Si un JPG no existe, se oculta y queda el degradado de respaldo
+      $$('img[data-fallback]').forEach(img => {
+        const hide = () => img.classList.add('hidden');
+        img.addEventListener('error', hide);
+        if (img.complete && img.naturalWidth === 0) hide();
+      });
+
+      // Newsletter
+      const form = $('#newsForm'), msg = $('#formMsg'), email = $('#email');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const ok = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.value.trim());
+        msg.textContent = ok ? 'Welcome to the shadows. Check your inbox.' : 'Please enter a valid email address.';
+        msg.className = 'mt-4 text-sm min-h-[1.25rem] ' + (ok ? 'text-green-500' : 'text-blood');
+        if (ok) form.reset();
+      });
+
+      $('#year').textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>
